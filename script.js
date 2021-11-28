@@ -1,6 +1,8 @@
+import { switchPlayer } from './switchPlayer.js';
+
 // Selecting elemnts
-const player0El = document.querySelector('.player--0');
-const player1El = document.querySelector('.player--1');
+export const player0El = document.querySelector('.player--0');
+export const player1El = document.querySelector('.player--1');
 const score0El = document.querySelector('#score--0');
 const score1El = document.getElementById('score--1');
 const current0El = document.getElementById('current--0');
@@ -35,21 +37,8 @@ const init = () => {
 
 init();
 
-const switchPlayer = () => {
-  document.getElementById(`current--${activePlayer}`).textContent = 0;
-  currentScore = 0;
-
-  // Provera igraca
-  activePlayer = activePlayer === 0 ? 1 : 0;
-
-  // Prebacivanje sa igraca na igraca
-  player0El.classList.toggle('player--active');
-  player1El.classList.toggle('player--active');
-};
-
 // Rolling dice functionality
-
-btnRoll.addEventListener('click', () => {
+const bacanje = () => {
   if (playing) {
     const dice = Math.trunc(Math.random() * 6) + 1;
     diceEl.classList.remove('hidden');
@@ -58,27 +47,41 @@ btnRoll.addEventListener('click', () => {
 
     if (dice !== 1) {
       currentScore += dice;
-      document.getElementById(`current--${activePlayer}`).textContent = currentScore;
+      document.getElementById(`current--${activePlayer}`).textContent =
+        currentScore;
     } else {
-      switchPlayer();
+      activePlayer = switchPlayer(activePlayer, currentScore);
     }
   }
-});
+};
 
-btnHold.addEventListener('click', () => {
+const krajIgre = () => {
   if (playing) {
     scores[activePlayer] += currentScore;
     // scores[1] = scores[1] + currentScore
-    document.getElementById(`score--${activePlayer}`).textContent = scores[activePlayer];
+    document.getElementById(`score--${activePlayer}`).textContent =
+      scores[activePlayer];
 
-    if (scores[activePlayer] >= 100) {
+    if (scores[activePlayer] >= 20) {
       playing = false;
-      document.querySelector(`.player--${activePlayer}`).classList.add('player--winner');
-      document.querySelector(`.player--${activePlayer}`).classList.add('player--active');
+      document
+        .querySelector(`.player--${activePlayer}`)
+        .classList.add('player--winner');
+      document
+        .querySelector(`.player--${activePlayer}`)
+        .classList.add('player--active');
       diceEl.classList.add('hidden');
     } else {
-      switchPlayer();
+      activePlayer = switchPlayer(activePlayer, currentScore);
     }
   }
-  btnNew.addEventListener('click', init);
+};
+
+btnRoll.addEventListener('click', () => {
+  bacanje();
 });
+
+btnHold.addEventListener('click', () => {
+  krajIgre();
+});
+btnNew.addEventListener('click', init);
